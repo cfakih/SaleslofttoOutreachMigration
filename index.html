@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salesloft to Outreach Migration Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: #1f1f1f;
+            background-color: #ffffff;
+        }
+        
+        /* Navigation Sidebar */
+        .sidebar-nav {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 280px;
+            background: #fbfbfb;
+            border-right: 1px solid #e6e6e6;
+            z-index: 1000;
+            padding: 2rem 0;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-nav.collapsed {
+            width: 60px;
+        }
+        
+        .nav-header {
+            padding: 0 2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e6e6e6;
+            margin-bottom: 2rem;
+        }
+        
+        .nav-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #120044;
+            transition: opacity 0.3s ease;
+        }
+        
+        .collapsed .nav-header h3 {
+            opacity: 0;
+        }
+        
+        .nav-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            color: #575757;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-toggle:hover {
+            color: #3028a1;
+        }
+        
+        .nav-links {
+            list-style: none;
+        }
+        
+        .nav-link {
+            display: block;
+            padding: 1rem 2rem;
+            color: #575757;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            white-space: nowrap;
+        }
+        
+        .nav-link:hover {
+            color: #3028a1;
+            background-color: #f0f0ff;
+            border-left-color: #3028a1;
+        }
+        
+        .nav-link.active {
+            color: #120044;
+            background-color: #cdcbff;
+            border-left-color: #5951ff;
+            font-weight: 600;
+        }
+        
+        .collapsed .nav-link {
+            padding: 1rem 1.2rem;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+        
+        .collapsed .nav-link span {
+            display: none;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .collapsed + .main-content {
+            margin-left: 60px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        /* Header */
+        .hero-header {
+            background: linear-gradient(135deg, #120044 0%, #3028a1 50%, #5951ff 100%);
+            color: white;
+            padding: 4rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.05) 50%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        
+        @keyframes shimmer {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-content h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .hero-content p {
+            font-size: 1.3rem;
+            font-weight: 300;
+            opacity: 0.95;
+        }
+        
+        /* Section Styling */
+        .section {
+            padding: 4rem 0;
+        }
+        
+        .section:nth-child(even) {
+            background-color: #fbfbfb;
+        }
+        
+        .section h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #120044;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -0.5rem;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, #5951ff, #7a7fff);
+            border-radius: 2px;
+        }
+        
+        .section h3 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #030268;
+            margin: 2.5rem 0 1.5rem;
+        }
+        
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(18, 0, 68, 0.1);
+            transition: all 0.3s ease;
+            border-left: 4px solid #cdcbff;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(18, 0, 68, 0.15);
+            border-left-color: #5951ff;
+        }
+        
+        .card h4 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #120044;
+            margin-bottom: 1rem;
+        }
+        
+        /* Phase Cards */
+        .phase-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
+        }
+        
+        .phase-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(18, 0, 68, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .phase-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(18, 0, 68, 0.15);
+        }
+        
+        .phase-header {
+            background: linear-gradient(135deg, #3028a1, #5951ff);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .phase-header h4 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .phase-content {
+            padding: 2rem;
+        }
+        
+        .phase-content ul {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+        
+        .phase-content li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .phase-content li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #5951ff;
+            font-weight: bold;
+        }
+        
+        /* Timeline */
+        .timeline {
+            position: relative;
+            margin: 3rem 0;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            height: 100%;
+            width: 2px;
+            background: linear-gradient(180deg, #5951ff, #7a7fff);
+            transform: translateX(-50%);
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin: 2rem 0;
+            position: relative;
+        }
+        
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-right: auto;
+            margin-left: 0;
+            width: 45%;
+        }
+        
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-left: auto;
+            margin-right: 0;
+            width: 45%;
+        }
+        
+        .timeline-content {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(18, 0, 68, 0.1);
+            position: relative;
+        }
+        
+        .timeline-marker {
+            position: absolute;
+            left: 50%;
+            width: 16px;
+            height: 16px;
+            background: #5951ff;
+            border: 4px solid white;
+            border-radius: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 2px 4px rgba(18, 0, 68, 0.2);
+        }
+        
+        /* FAQ Section */
+        .faq-item {
+            background: white;
+            margin: 1rem 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(18, 0, 68, 0.05);
+            overflow: hidden;
+        }
+        
+        .faq-question {
+            background: linear-gradient(135deg, #f0f0ff, #cdcbff);
+            padding: 1.5rem;
+            font-weight: 600;
+            color: #120044;
+            border-left: 4px solid #5951ff;
+        }
+        
+        .faq-answer {
+            padding: 1.5rem;
+            background: white;
+        }
+        
+        /* Tables */
+        .resource-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(18, 0, 68, 0.1);
+        }
+        
+        .resource-table th {
+            background: linear-gradient(135deg, #3028a1, #5951ff);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .resource-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e6e6e6;
+        }
+        
+        .resource-table tr:hover {
+            background-color: #f0f0ff;
+        }
+        
+        /* Highlight Boxes */
+        .highlight-box {
+            background: linear-gradient(135deg, #f0f0ff, #cdcbff);
+            border-left: 4px solid #5951ff;
+            padding: 2rem;
+            margin: 2rem 0;
+            border-radius: 8px;
+        }
+        
+        .highlight-box h4 {
+            color: #120044;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        /* Success Metrics */
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .metric-card {
+            background: white;
+            padding: 2rem;
+            text-align: center;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(18, 0, 68, 0.1);
+            transition: all 0.3s ease;
+            border-top: 4px solid #5951ff;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(18, 0, 68, 0.15);
+        }
+        
+        .metric-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #5951ff;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-label {
+            color: #575757;
+            font-weight: 500;
+        }
+        
+        /* Mobile Responsiveness */
+        @media (max-width: 1024px) {
+            .sidebar-nav {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .collapsed + .main-content {
+                margin-left: 0;
+            }
+            
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+            
+            .hero-content p {
+                font-size: 1.1rem;
+            }
+            
+            .section h2 {
+                font-size: 2rem;
+            }
+            
+            .timeline::before {
+                left: 20px;
+            }
+            
+            .timeline-item:nth-child(odd) .timeline-content,
+            .timeline-item:nth-child(even) .timeline-content {
+                margin-left: 50px;
+                margin-right: 0;
+                width: auto;
+            }
+            
+            .timeline-marker {
+                left: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Sidebar -->
+    <nav class="sidebar-nav" id="sidebarNav">
+        <div class="nav-header">
+            <h3>Navigation</h3>
+            <button class="nav-toggle" id="navToggle">☰</button>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#executive-summary" class="nav-link" data-icon="📋"><span>Executive Summary</span></a></li>
+            <li><a href="#migration-overview" class="nav-link" data-icon="🔄"><span>Migration Overview</span></a></li>
+            <li><a href="#implementation-process" class="nav-link" data-icon="⚙️"><span>Implementation Process</span></a></li>
+            <li><a href="#resource-requirements" class="nav-link" data-icon="👥"><span>Resource Requirements</span></a></li>
+            <li><a href="#common-questions" class="nav-link" data-icon="❓"><span>Common Questions</span></a></li>
+            <li><a href="#success-factors" class="nav-link" data-icon="🎯"><span>Success Factors</span></a></li>
+            <li><a href="#timeline-considerations" class="nav-link" data-icon="⏱️"><span>Timeline Considerations</span></a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Hero Header -->
+        <header class="hero-header">
+            <div class="container">
+                <div class="hero-content">
+                    <h1>Salesloft to Outreach Migration Guide</h1>
+                    <p>Your comprehensive roadmap to seamless platform transition with zero business disruption</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Executive Summary -->
+        <section id="executive-summary" class="section">
+            <div class="container">
+                <h2>Executive Summary</h2>
+                
+                <div class="highlight-box">
+                    <h4>Migration at a Glance</h4>
+                    <p><strong>Timeline:</strong> 6-10 weeks depending on team size<br>
+                    <strong>Business Impact:</strong> Zero downtime, seamless transition<br>
+                    <strong>Success Rate:</strong> 95%+ adoption when following proven methodology</p>
+                </div>
+
+                <div class="metric-grid">
+                    <div class="metric-card">
+                        <span class="metric-number">1000+</span>
+                        <div class="metric-label">Annual Implementations</div>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-number">95%</span>
+                        <div class="metric-label">User Adoption Rate</div>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-number">0</span>
+                        <div class="metric-label">Business Downtime</div>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-number">4</span>
+                        <div class="metric-label">Implementation Phases</div>
+                    </div>
+                </div>
+
+                <p>Migrating from Salesloft to Outreach follows a proven four-phase methodology designed to minimize business disruption while maximizing platform adoption. Our Professional Services team has successfully guided over 1,000 implementations annually, with specialized expertise in Salesloft migrations.</p>
+            </div>
+        </section>
+
+        <!-- Migration Overview -->
+        <section id="migration-overview" class="section">
+            <div class="container">
+                <h2>Migration Overview</h2>
+                
+                <div class="card-grid">
+                    <div class="card">
+                        <h4>Proven Methodology</h4>
+                        <p>Four-phase approach (Align, Design, Mobilize, Execute) refined through hundreds of Salesloft migrations with predictable outcomes and clear deliverables.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Dedicated Support Team</h4>
+                        <p>Senior PS Consultant, Technical Specialist, Training Expert, and Project Manager assigned from day one through go-live and beyond.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Business Continuity</h4>
+                        <p>Friday-to-Monday platform switch with no gaps in prospecting, meeting booking, or sales activities. All in-flight cadences managed appropriately.</p>
+                    </div>
+                </div>
+
+                <h3>What Makes This Different</h3>
+                <div class="highlight-box">
+                    <h4>Superior Platform Architecture</h4>
+                    <ul>
+                        <li><strong>Bi-directional Salesforce sync</strong> with conflict resolution (up to 6 retry attempts)</li>
+                        <li><strong>Single integration user</strong> eliminates individual authentication issues</li>
+                        <li><strong>Automatic activity logging</strong> - no manual "lofting" required</li>
+                        <li><strong>Ownership respect</strong> without data corruption during transfers</li>
+                        <li><strong>99.95% uptime SLA</strong> vs. industry standard 99.5%</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Implementation Process -->
+        <section id="implementation-process" class="section">
+            <div class="container">
+                <h2>Implementation Process</h2>
+                
+                <div class="phase-container">
+                    <!-- Phase 1: Align -->
+                    <div class="phase-card">
+                        <div class="phase-header">
+                            <h4>Phase 1: Align</h4>
+                            <p>Week 1</p>
+                        </div>
+                        <div class="phase-content">
+                            <h5>Stakeholder alignment and project foundation</h5>
+                            <ul>
+                                <li>Project kickoff and team introductions</li>
+                                <li>Success metrics definition</li>
+                                <li>Timeline confirmation with contract dates</li>
+                                <li>Communication protocol establishment</li>
+                            </ul>
+                            <p><strong>Your Time Investment:</strong> 2-4 hours total</p>
+                        </div>
+                    </div>
+
+                    <!-- Phase 2: Design -->
+                    <div class="phase-card">
+                        <div class="phase-header">
+                            <h4>Phase 2: Design</h4>
+                            <p>Weeks 2-5</p>
+                        </div>
+                        <div class="phase-content">
+                            <h5>Platform configuration and content migration</h5>
+                            <ul>
+                                <li>Workflow discovery interviews (30 min per rep)</li>
+                                <li>Content strategy and migration planning</li>
+                                <li>Salesforce integration setup and testing</li>
+                                <li>Governance and permissions configuration</li>
+                            </ul>
+                            <p><strong>Your Time Investment:</strong> 15-25 hours across team</p>
+                        </div>
+                    </div>
+
+                    <!-- Phase 3: Mobilize -->
+                    <div class="phase-card">
+                        <div class="phase-header">
+                            <h4>Phase 3: Mobilize</h4>
+                            <p>Weeks 4-6</p>
+                        </div>
+                        <div class="phase-content">
+                            <h5>Training preparation and change readiness</h5>
+                            <ul>
+                                <li>Manager training and preparation</li>
+                                <li>Communication plan execution</li>
+                                <li>Go-live readiness assessment</li>
+                                <li>Training schedule coordination</li>
+                            </ul>
+                            <p><strong>Your Time Investment:</strong> 3-5 hours for managers</p>
+                        </div>
+                    </div>
+
+                    <!-- Phase 4: Execute -->
+                    <div class="phase-card">
+                        <div class="phase-header">
+                            <h4>Phase 4: Execute</h4>
+                            <p>Week 6</p>
+                        </div>
+                        <div class="phase-content">
+                            <h5>Training delivery and platform launch</h5>
+                            <ul>
+                                <li>End-user training (2 one-hour sessions)</li>
+                                <li>Platform launch with real-time support</li>
+                                <li>Office hours and adoption monitoring</li>
+                                <li>Success metrics tracking initiation</li>
+                            </ul>
+                            <p><strong>Your Time Investment:</strong> 2 hours per end user</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Content Migration Strategy</h3>
+                <div class="card-grid">
+                    <div class="card">
+                        <h4>Manual Migration</h4>
+                        <p><strong>Best for:</strong> Teams with <50 sequences<br>
+                        <strong>Approach:</strong> Internal copy/paste with optimization<br>
+                        <strong>Benefit:</strong> Full control over content decisions</p>
+                    </div>
+                    <div class="card">
+                        <h4>Partner-Assisted Migration</h4>
+                        <p><strong>Best for:</strong> Teams with 50+ sequences<br>
+                        <strong>Approach:</strong> Professional migration service<br>
+                        <strong>Benefit:</strong> Faster execution, expert handling</p>
+                    </div>
+                    <div class="card">
+                        <h4>Fresh Start Approach</h4>
+                        <p><strong>Best for:</strong> Content library cleanup needed<br>
+                        <strong>Approach:</strong> Create optimized content from scratch<br>
+                        <strong>Benefit:</strong> Eliminate legacy issues, best practices</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Resource Requirements -->
+        <section id="resource-requirements" class="section">
+            <div class="container">
+                <h2>Resource Requirements</h2>
+                
+                <h3>Team Size Scaling</h3>
+                <table class="resource-table">
+                    <thead>
+                        <tr>
+                            <th>Team Size</th>
+                            <th>Timeline</th>
+                            <th>Project Lead Time</th>
+                            <th>CRM Admin Time</th>
+                            <th>Content Creator Time</th>
+                            <th>Training Sessions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>75-100 users</td>
+                            <td>6 weeks</td>
+                            <td>20-25 hours</td>
+                            <td>8-12 hours</td>
+                            <td>10-15 hours</td>
+                            <td>2-3 sessions</td>
+                        </tr>
+                        <tr>
+                            <td>100-200 users</td>
+                            <td>6-8 weeks</td>
+                            <td>25-35 hours</td>
+                            <td>12-15 hours</td>
+                            <td>15-20 hours</td>
+                            <td>4-5 sessions</td>
+                        </tr>
+                        <tr>
+                            <td>200+ users</td>
+                            <td>8-10 weeks</td>
+                            <td>35-45 hours</td>
+                            <td>15-20 hours</td>
+                            <td>20-25 hours</td>
+                            <td>6-8 sessions</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Professional Services Team</h3>
+                <div class="card-grid">
+                    <div class="card">
+                        <h4>Senior PS Consultant</h4>
+                        <p>Leads workflow discovery, provides best practice guidance, and ensures platform configuration aligns with your business needs.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Technical Consultant</h4>
+                        <p>Handles Salesforce integration setup, testing, and technical configuration to ensure seamless data flow.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Training Specialist</h4>
+                        <p>Delivers customized training sessions and works with your enablement team for ongoing success.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Project Manager</h4>
+                        <p>Coordinates timeline, deliverables, and stakeholder communication throughout the implementation.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Common Questions -->
+        <section id="common-questions" class="section">
+            <div class="container">
+                <h2>Common Questions</h2>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        How long does a typical migration take and what factors affect timeline?
+                    </div>
+                    <div class="faq-answer">
+                        Timeline ranges from 6-10 weeks depending on team size and complexity. Teams under 100 users typically complete in 6 weeks, while organizations with 200+ users need 8-10 weeks. Key factors include content volume, regional coordination needs, custom automation requirements, and training schedule coordination around business cycles.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        What happens to prospects currently in Salesloft cadences?
+                    </div>
+                    <div class="faq-answer">
+                        We offer three proven approaches: (1) Natural completion - stop new additions and let existing cadences finish; (2) Placeholder sequences - transfer prospects to generic follow-up sequences in Outreach; (3) Mapped migration - recreate equivalent sequences and transfer at appropriate steps. Most customers choose option 1 or 2 for simplicity.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        How much time will our team need to invest in the migration?
+                    </div>
+                    <div class="faq-answer">
+                        For most implementations, expect 3-5 hours weekly from your project lead, with concentrated efforts during specific phases. CRM admins need 8-15 hours total for integration setup. Content creators require 10-25 hours depending on migration volume. End users need just 2 hours of training time.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        Can we accelerate the timeline if needed?
+                    </div>
+                    <div class="faq-answer">
+                        Yes, Outreach won't be the bottleneck. Acceleration depends on your team's resource availability and decision-making speed. We can compress phases and run parallel workstreams when your team can support faster execution.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        What about training timing - too early and people forget, too late and they scramble?
+                    </div>
+                    <div class="faq-answer">
+                        We've refined the training schedule through hundreds of implementations. Managers train first, then end users train 2-3 days before go-live. This ensures information is fresh while providing adequate preparation time. We coordinate around your business cycles to avoid disruption during critical periods.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        How do we ensure no business disruption during the switch?
+                    </div>
+                    <div class="faq-answer">
+                        Zero-downtime transitions are our standard approach. Technical setup happens in parallel with your existing operations. The actual switch occurs over a weekend, with comprehensive testing and rollback procedures. Teams continue prospecting seamlessly from Monday morning.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        What if our RevOps team is already at 120% utilization?
+                    </div>
+                    <div class="faq-answer">
+                        This is common - most RevOps teams are stretched thin. Our project managers work specifically with resource-constrained teams. We design implementations around your availability, provide clear time blocks rather than continuous commitment, and can adjust phases based on your bandwidth.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        How is the Salesforce integration different from Salesloft?
+                    </div>
+                    <div class="faq-answer">
+                        Major improvements include: single integration user (eliminates individual authentication issues), bi-directional sync with conflict resolution (retries failed syncs up to 6 times), bulk API usage for efficiency, and automatic ownership respect without data corruption. These architectural differences eliminate common Salesloft sync problems.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Success Factors -->
+        <section id="success-factors" class="section">
+            <div class="container">
+                <h2>Success Factors</h2>
+                
+                <h3>Critical Elements for Migration Success</h3>
+                <div class="card-grid">
+                    <div class="card">
+                        <h4>Executive Sponsorship</h4>
+                        <p>Visible leadership support during communications and resource allocation commitment throughout the implementation process.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Dedicated Project Lead</h4>
+                        <p>Single point of accountability with decision-making authority and consistent availability for coordination.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Champion Network</h4>
+                        <p>Early adopters across teams and regions who support peer adoption and provide workflow feedback.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Content Strategy Alignment</h4>
+                        <p>Clear governance between sales and marketing teams with defined approval processes and feedback loops.</p>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>Migration Advantages</h4>
+                    <p>Organizations migrating from Salesloft to Outreach consistently report:</p>
+                    <ul>
+                        <li><strong>Eliminated sync issues</strong> - No more manual "lofting" or authentication problems</li>
+                        <li><strong>Improved data quality</strong> - Conflict resolution and automated activity capture</li>
+                        <li><strong>Better call quality</strong> - Reduced dropped calls and connection issues</li>
+                        <li><strong>Enhanced reporting</strong> - Clickable, drillable analytics with pipeline attribution</li>
+                        <li><strong>Platform reliability</strong> - 99.95% uptime with continuous platform investment</li>
+                    </ul>
+                </div>
+
+                <h3>Adoption Drivers</h3>
+                <div class="card-grid">
+                    <div class="card">
+                        <h4>Workflow Familiarity</h4>
+                        <p>Configuration mirrors existing processes before optimization, reducing learning curve and change resistance.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Content Availability</h4>
+                        <p>Critical sequences and templates available from day one, with migration strategy preserving proven messaging.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Manager Preparedness</h4>
+                        <p>Frontline managers trained first to provide immediate support and reinforce proper platform usage.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Ongoing Support</h4>
+                        <p>Office hours, managed services options, and customer success partnership ensure long-term success.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Timeline Considerations -->
+        <section id="timeline-considerations" class="section">
+            <div class="container">
+                <h2>Timeline Considerations</h2>
+                
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <h4>Contract Planning</h4>
+                            <p>Begin implementation planning 3-4 months before Salesloft contract expiration to ensure adequate preparation time and avoid rushed decisions.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <h4>Professional Services Assignment</h4>
+                            <p>2-week resource allocation period after contract signature. Early commitment accelerates this process for urgent timelines.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <h4>Business Cycle Coordination</h4>
+                            <p>Training and go-live scheduling around end-of-quarter and holiday periods to minimize sales disruption during critical periods.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <h4>Regional Considerations</h4>
+                            <p>Multi-timezone coordination for global teams, with training sessions accommodating different regions and local business hours.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Complexity Factors</h3>
+                <div class="card-grid">
+                    <div class="card">
+                        <h4>Lower Complexity (6 weeks)</h4>
+                        <ul>
+                            <li>Under 100 users</li>
+                            <li>Single region/language</li>
+                            <li>Standard workflows</li>
+                            <li>Minimal custom automation</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>Higher Complexity (8-10 weeks)</h4>
+                        <ul>
+                            <li>200+ users across regions</li>
+                            <li>Complex automation requirements</li>
+                            <li>Custom Salesforce objects</li>
+                            <li>Specialized workflows by team</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>Migration Readiness Checklist</h4>
+                    <ul>
+                        <li>Salesloft contract end date confirmed</li>
+                        <li>Executive sponsor and project lead identified</li>
+                        <li>Current content audit completed</li>
+                        <li>Salesforce admin access secured</li>
+                        <li>Business cycle calendar reviewed for optimal timing</li>
+                        <li>Regional coordination requirements mapped</li>
+                        <li>Success metrics and measurement plan defined</li>
+                    </ul>
+                </div>
+
+                <p style="text-align: center; font-style: italic; margin-top: 3rem; color: #575757;">
+                    This implementation guide reflects Outreach's proven methodology used across 1,000+ annual implementations. The process is designed to ensure seamless platform transition while maximizing user adoption and long-term success.
+                </p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Navigation functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const navToggle = document.getElementById('navToggle');
+            const sidebarNav = document.getElementById('sidebarNav');
+            const mainContent = document.getElementById('mainContent');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            // Toggle navigation collapse
+            navToggle.addEventListener('click', function() {
+                sidebarNav.classList.toggle('collapsed');
+            });
+
+            // Smooth scrolling for navigation links
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetSection = document.querySelector(targetId);
+                    if (targetSection) {
+                        targetSection.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            // Active section tracking
+            function updateActiveNav() {
+                const sections = document.querySelectorAll('.section');
+                let currentSection = '';
+
+                sections.forEach(section => {
+                    const rect = section.getBoundingClientRect();
+                    if (rect.top <= 100 && rect.bottom >= 100) {
+                        currentSection = section.id;
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === '#' + currentSection) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+
+            // Update active nav on scroll
+            window.addEventListener('scroll', updateActiveNav);
+            updateActiveNav(); // Initial call
+
+            // Update collapsed nav link content
+            function updateCollapsedContent() {
+                const isCollapsed = sidebarNav.classList.contains('collapsed');
+                navLinks.forEach(link => {
+                    const icon = link.getAttribute('data-icon');
+                    if (isCollapsed) {
+                        link.innerHTML = icon;
+                        link.title = link.querySelector('span')?.textContent || '';
+                    } else {
+                        link.innerHTML = `<span>${link.title || link.textContent}</span>`;
+                        link.title = '';
+                    }
+                });
+            }
+
+            // Update on collapse toggle
+            navToggle.addEventListener('click', function() {
+                setTimeout(updateCollapsedContent, 300); // Wait for transition
+            });
+
+            // Initial setup
+            updateCollapsedContent();
+        });
+    </script>
+</body>
+</html>
